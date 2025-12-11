@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
     handleCandyCollision(player, candy) {
         if (this.keyA.isDown) {
             // Tecla A presionada: atrapar caramelo, sumar puntos
-            this.addPoints(1);  
+            this.addPoints(10);  
             candy.destroy();
         } else {
             // Tecla A no presionada: choque, resta vida
