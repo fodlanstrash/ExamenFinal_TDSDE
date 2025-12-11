@@ -1,14 +1,18 @@
 import Phaser from "phaser";
-
+import Floor from "../prefabs/Floor.js";
+import Player from "../prefabs/Player.js";
+import HUD from "../prefabs/HUD.js";
+import Candy from "../prefabs/Candy.js";
+import SmallMonster from "../prefabs/SmallMonster.js";
 
 class GameScene extends Phaser.Scene {
-    _constructor() {
+    constructor() {
         super("GameScene");
     }
 
-    _create() {
-        score = 0;
-        const lastScore = localStorage("lastScore");
+    create() {
+        this.score = 0;
+        const lastScore = localStorage.getItem("lastScore");
 
         if (lastScore !== null) {
             this.lastScoreText = this.add.text(
@@ -32,75 +36,111 @@ class GameScene extends Phaser.Scene {
         this.lifes = 3;
         this.floor = new Floor(this, width / 2, height);
         this.player = new Player(this, width * 0.5, height * 0.70);
+        
+        this.targetX = this.player.x;
+        this.moveSpeed = 250; // píxeles por segundo
+        this.stopDistance = 5; // distancia mínima para detener movimiento
 
-        this.input.on("pointerdowns", (pointer) => {
-            if (pointer.x < width / 2) {
-                this.player.moveLeft();
-            } else {
-                this.player.moveRight();
-            }
+        // Input para click-to-move en eje X
+        this.input.on("pointerdown", (pointer) => {
+            this.targetX = pointer.x;
         });
 
-        this.input.on("pointerups", () => {
-            this.player.stop();
-        });
+        // Colisión del jugador con el piso
         this.physics.add.collider(this.player, this.floor);
 
-        this.candies = this.add.group({
-        });
+        // Grupos de objetos
+        this.candies = this.add.group({});
+        this.smallMonsters = this.add.group({});
 
-        this.smallMonsters = this.add.group({
-        });
-
+        // Generador de candies
         this.time.addEvent({
             delay: 700,
             callback: () => this.spawnCandy(),
+            loop: true,
         });  
 
+        // Generador de monstruos pequeños
         this.time.addEvent({
             delay: 3500,          
             callback: () => this.spawnSmallMonster(),
+            loop: true,
         });        
-        this.hud = new HUD(this, this.lifes);
-        this.keyA = this.input.addKey(Phaser.Input.Keyboard.KeyCode.A);
 
-        this.physics.add.overlap(this.player, this.smallMonsters, null, null, this);
-        this.physics.add.overlap(this.player, this.candies, null, null, this);
+        // HUD y input
+        this.hud = new HUD(this, this.lifes);
+        // Registrar tecla A usando el teclado del sistema de input
+        this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+
+        // Colisiones con callbacks
+        this.physics.add.overlap(
+            this.player, 
+            this.smallMonsters, 
+            this.handleSmallMonsterCollision, 
+            null, 
+            this
+        );
+        this.physics.add.overlap(
+            this.player, 
+            this.candies, 
+            this.handleCandyCollision, 
+            null, 
+            this
+        );
+    }
+
+    update() {
+        // Movimiento click-to-move en eje X
+        const distanceToTarget = Math.abs(this.targetX - this.player.x);
+
+        if (distanceToTarget > this.stopDistance) {
+            // Determinar dirección
+            const direction = this.targetX > this.player.x ? 1 : -1;
+            
+            // Mover hacia el objetivo
+            this.player.setVelocityX(direction * this.moveSpeed);
+            this.player.flipX = direction < 0;
+        } else {
+            // Detener cuando está cerca del objetivo
+            this.player.setVelocityX(0);
+        }
     }
 
     handleSmallMonsterCollision(player, smallMonster) {
         smallMonster.destroy();
 
-        if(lifes < 3){
+        if (this.lifes < 3) {
             this.hud.addLife();
-            lifes++;
+            this.lifes++;
         }
     }
 
     handleCandyCollision(player, candy) {
-        if (keyA.isDown) {
-            addPoints(10);  
+        if (this.keyA.isDown) {
+            // Tecla A presionada: atrapar caramelo, sumar puntos
+            this.addPoints(1);  
             candy.destroy();
-
         } else {
-            lifes--;
-            hud.removeLife();
+            // Tecla A no presionada: choque, resta vida
+            this.lifes--;
+            this.hud.removeLife();
             candy.destroy();
-            if(this.lifes <= 0){
+            
+            if (this.lifes <= 0) {
                 this.handleGameOver();
             }
         }
     }
 
-    handleGameOver(){
+    handleGameOver() {
         localStorage.setItem("lastScore", this.score);
-        physics.pause();
-        scene.start("GameOverScene");
+        this.physics.pause();
+        this.scene.start("GameOverScene");
     }
 
     addPoints(amount) {
-        score = (score || 0) + amount;
-        console.log("Puntos:", score);
+        this.score = (this.score || 0) + amount;
+        console.log("Puntos:", this.score);
     }
 
 
@@ -116,7 +156,6 @@ class GameScene extends Phaser.Scene {
         this.smallMonsters.add(m);
     }
 
-
     spawnCandy() {
         const { width } = this.scale;
 
@@ -125,7 +164,6 @@ class GameScene extends Phaser.Scene {
 
         this.candies.add(candy);
     }
-
 }
 
 export default GameScene;

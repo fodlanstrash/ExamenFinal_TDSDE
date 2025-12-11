@@ -2,11 +2,11 @@ import Phaser from "phaser";
 
 export default class GameOverScene extends Phaser.Scene {
 
-    _constructor() {
+    constructor() {
         super("GameOverScene");
     }
 
-    _create() {
+    create() {
 
         const { width, height } = this.scale;
 

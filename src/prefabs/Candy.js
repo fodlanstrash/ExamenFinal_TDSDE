@@ -7,7 +7,8 @@ export default class Candy extends Phaser.Physics.Arcade.Sprite {
         const frame = Phaser.Math.Between(0, 4);
 
         super(scene, x, y, "candies", frame);
-
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         this.setScale(0.6);
         this.setDepth(10);

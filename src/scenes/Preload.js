@@ -1,38 +1,39 @@
 import Phaser from "phaser";
 
 class PreloadScene extends Phaser.Scene {
-    _constructor() {
+    constructor() {
         super("PreloadScene");
     }
 
-    _preload() {
+    preload() {
 
        
-        this.loads.image('monster', 'assets/monster-cover.png');
+        this.load.image('monster', 'imgs/monster-cover.png');
 
-        this.loads.image('title', 'assets/title.png');
+        this.load.image('title', 'imgs/title.png');
 
-        this.loads.image('background', 'assets/background.png');
+        this.load.image('background', 'imgs/background.png');
 
-        this.loads.image('pauseBtn', 'assets/button-pause.png');
+        this.load.image('pauseBtn', 'imgs/button-pause.png');
 
-        this.loads.spritesheet('startBtn', 'assets/button-start.png', {
+        this.load.spritesheet('startBtn', 'imgs/button-start.png', {
             frameWidth: 400,
             frameHeight: 140
         });
 
-        this.loads.spritesheet('candies', 'assets/candy.png', {
+        this.load.spritesheet('candies', 'imgs/candy.png', {
             frameWidth: 90,
             frameHeight: 90
         });
 
-        this.loads.image('floor', 'assets/floor.png');
+        this.load.image('floor', 'imgs/floor.png');
 
-        this.loads.image('gameover', 'assets/gameover.png');
+        this.load.image('gameover', 'imgs/gameover.png');
     }
 
-    _create() {
-        this.scene.start("MenusScene");
+    create() {
+        this.scene.start("MenuScene");
     }
 }
 
+export default PreloadScene;

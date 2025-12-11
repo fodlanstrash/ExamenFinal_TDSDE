@@ -1,4 +1,9 @@
 import Phaser from "phaser";
+import PreloadScene from "./scenes/Preload.js";
+import MenuScene from "./scenes/Menu.js";
+import GameScene from "./scenes/Game.js";
+import GameOverScene from "./scenes/GameOver.js";
+
 const config = {
     type: Phaser.AUTO,
     width: 720,

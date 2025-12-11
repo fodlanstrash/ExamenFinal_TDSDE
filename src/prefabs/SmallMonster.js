@@ -4,7 +4,9 @@ export default class SmallMonster extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene, x, y) {
 
-        super(scene, x, y, "monster"); 
+        super(scene, x, y, "monster");
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         this.setScale(0.18);     
         this.setDepth(12);

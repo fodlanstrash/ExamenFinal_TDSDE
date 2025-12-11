@@ -11,6 +11,10 @@ module.exports = {
     mode : 'development',
     devtool: 'inline-source-map',
     devServer: {
-        static : './src'
+        static : './src',
+        port: 8080,
+        open: false,
+        hot: true,
+        historyApiFallback: true
     }
 }
